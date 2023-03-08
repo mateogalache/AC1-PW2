@@ -1,15 +1,14 @@
 <?php
 require_once __DIR__ . '/vendor/autoload.php';
 
+$email_message = '';
+$password_message = '';
 
-
-
-
+if (!empty($_POST)) {
 
         $user = 'admin';
         $pass = 'admin';
-        $email_message = '';
-        $password_message = '';
+
         $email = $_POST['email'];
         $password = $_POST['password'];
 
@@ -19,13 +18,15 @@ require_once __DIR__ . '/vendor/autoload.php';
             ,$_POST['password']);
 
         if ($email && $password){
-            $email_message = $email;
 
-            //$statement = $connection->prepare('INSERT INTO Users (email, passwod) VALUES (:email, :password)');
-            /*$statement->execute([
+
+            $statement = $connection->prepare('INSERT INTO Users (email, password) VALUES (:email, :password)');
+            $statement->execute([
                 'email' => $email,
                 'password' => $password,
-            ]);*/
+            ]);
+            header("Location: /login.php");
+            exit;
         }else{
             if (!$email && !$password){
                 $email_message = "Email is not valid";
@@ -36,30 +37,36 @@ require_once __DIR__ . '/vendor/autoload.php';
                 $password_message = "Password must contain at least one number, one capital letter, one small letter, and should be longer than or equal to 7 characters";
             }
         }
-
-
-
-
-
-
-
-
+}
 ?>
+
 <html>
 <div class="container">
     <div class="container0">
         <div class="title">SIGN UP</div>
         <form action="Register.php" method="POST" class="formInputs">
-            <input type="text" placeholder="Email" name="email" class="forms" id="email" value="<?php echo $email ?>">
+            <input type="text" placeholder="Email" name="email" class="forms" id="email">
             <p class= "errorMessage "> <?php echo $email_message ?></p>
             <input type="password" placeholder="Password" name="password" class="forms" id="email">
             <p class= "errorMessage "> <?php echo $password_message ?></p>
             <input type="submit" value="Register" class="registerButton">
         </form>
+        <aside class="alreadyLogged">Already registered? <a href="/login.php"> Sign in</a></aside>
     </div>
 </div>
 </html>
 <style>
+    .alreadyLogged a{
+        text-decoration: none;
+        color: blue;
+    }
+    .alreadyLogged{
+        width: 100%;
+        display: flex;
+        justify-content: end;
+        margin-top: -1rem;
+        gap: .5rem;
+    }
     .errorMessage{
         color: red;
         text-align: center;
@@ -81,6 +88,7 @@ require_once __DIR__ . '/vendor/autoload.php';
         border-radius: 50px;
         padding: 5rem;
         width: 30rem;
+        height: 25rem;
     }
     .formInputs{
         display: flex;
