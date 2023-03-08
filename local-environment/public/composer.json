@@ -1,0 +1,13 @@
+{
+    "name": "lasalle/ac1",
+    "description": "Exercise 1 of PW2 LaSalle",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Lasalle\\Ac1\\": "src/"
+        }
+    },
+    "require": {
+        "guzzlehttp/guzzle": "^7.5"
+    }
+}
