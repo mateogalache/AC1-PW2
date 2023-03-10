@@ -2,20 +2,22 @@
     require_once __DIR__ . '/vendor/autoload.php';
 
 
-    if (!empty($_POST)) {
-        $search = $_POST['search'];
-        $client = new GuzzleHttp\Client();
-        try {
-            $res = $client->request('GET', "https://api.thecatapi.com/v1/images/search", [
-                'Content-type' => 'application/json',
-                'x-api-key' => 'live_INrtVm1T5YHM0v8KCjO6PKHJqhxq5igHcSXl75XSja04ZGHO2Oq4MNXP86imhu0x'
-            ]);
-            echo $res->getBody();
-        } catch (\GuzzleHttp\Exception\GuzzleException $e) {
 
-        }
-
+   // $search = $_POST['search'];
+    $client = new GuzzleHttp\Client();
+    try {
+        $res = $client->request('GET', "https://api.thecatapi.com/v1/images/search?breeds_id=asy&limit=100", [
+            'Content-type' => 'application/json',
+            'x-api-key' => 'live_INrtVm1T5YHM0v8KCjO6PKHJqhxq5igHcSXl75XSja04ZGHO2Oq4MNXP86imhu0x'
+        ]);
+        $catsInfo = json_decode($res->getBody()->getContents()) ;
+    } catch (\GuzzleHttp\Exception\GuzzleException $e) {
+        echo 'bad request';
     }
+
+
+
+
 ?>
 
 <html>
@@ -24,12 +26,48 @@
             <input type="text" placeholder="Search" id="search" name="search">
             <input type="submit" value="Search">
         </form>
-        <div class="cats">
 
-        </div>
+            <div class="cats">
+                <?php
+
+                foreach ($catsInfo as $cats) {
+                    echo "<div class='cat'>";
+                    echo "<img src='" . $cats->url . "'>";
+                    echo "<div class= 'info'>";
+                    echo "<div>";
+                    echo "Width: " . $cats->width . "px\n" ;
+                    echo"</div>";
+                    echo "<div>";
+                    echo  "Height: " . $cats->height . "px" ;
+                    echo "</div></div></div>";
+                }
+                ?>
+            </div>
+
+
     </div>
 </html>
 <style>
+    .cat img {
+        width: 25rem;
+        aspect-ratio: 1/1;
+    }
+    .cat {
+        display: block;
+    }
+    .info{
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+    }
+    .cats{
+        width: 100%;
+        gap: 1rem;
+        justify-content: center;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
     .container{
         width: 100%;
         height: 100%;
