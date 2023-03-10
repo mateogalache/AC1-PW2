@@ -1,19 +1,42 @@
 <?php
-    require_once __DIR__ . '/vendor/autoload.php';
+
+use GuzzleHttp\Client;
+
+require_once __DIR__ . '/vendor/autoload.php';
 
 
-
-   // $search = $_POST['search'];
+if(!EMPTY($_POST)) {
+    $search = $_POST['search'];
     $client = new GuzzleHttp\Client();
     try {
-        $res = $client->request('GET', "https://api.thecatapi.com/v1/images/search?breeds_id=asy&limit=100", [
+        $res = $client->request('GET', "https://api.thecatapi.com/v1/images/search?breeds_id={$search}&limit=100", [
             'Content-type' => 'application/json',
             'x-api-key' => 'live_INrtVm1T5YHM0v8KCjO6PKHJqhxq5igHcSXl75XSja04ZGHO2Oq4MNXP86imhu0x'
         ]);
-        $catsInfo = json_decode($res->getBody()->getContents()) ;
+        $catsInfo = json_decode($res->getBody()->getContents());
     } catch (\GuzzleHttp\Exception\GuzzleException $e) {
         echo 'bad request';
     }
+}
+/*
+
+
+    $client = new GuzzleHttp\Client();
+
+    $catsInfo = null;
+
+    $search = $_POST['search'];
+
+    $request = new \GuzzleHttp\Psr7\Request('GET', "https://api.thecatapi.com/v1/images/search?breeds_id=asy&limit=100",[
+            'Content-type' => 'application/json',
+            'x-api-key' => 'live_INrtVm1T5YHM0v8KCjO6PKHJqhxq5igHcSXl75XSja04ZGHO2Oq4MNXP86imhu0x'
+    ]);
+    $promise = $client->sendAsync($request)->then(function ($response) {
+        $catsInfo = json_decode($response->getBody()->getContents()) ;
+    });
+    $promise->wait();
+
+}*/
 
 
 
@@ -22,7 +45,7 @@
 
 <html>
     <div class="container">
-        <form  action="search.php" class="searchbar">
+        <form  action="search.php" class="searchbar" method="POST">
             <input type="text" placeholder="Search" id="search" name="search">
             <input type="submit" value="Search">
         </form>
@@ -35,7 +58,7 @@
                     echo "<img src='" . $cats->url . "'>";
                     echo "<div class= 'info'>";
                     echo "<div>";
-                    echo "Width: " . $cats->width . "px\n" ;
+                    echo "Width: " . $cats->width . "px" ;
                     echo"</div>";
                     echo "<div>";
                     echo  "Height: " . $cats->height . "px" ;
