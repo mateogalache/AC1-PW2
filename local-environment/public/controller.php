@@ -2,7 +2,12 @@
 
 use JetBrains\PhpStorm\NoReturn;
 
+$EMAIL_MESSAGE = "Email is not valid";
+$PASSWORD_MESSAGE = "Password must contain at least one number, one capital letter, one small letter, and should be longer than or equal to 7 characters";
+$BAD_MESSAGE = "The email or the password are wrong, try again";
 class controller{
+
+
 
     private function connectDb(): PDO
     {
@@ -66,22 +71,44 @@ class controller{
    {
        $email = $this->postData()[0];
        $password = $this->postData()[1];
+       $email_message = '';
+       $password_message = '';
+       $bad_message = '';
 
        $this->connectDb();
 
        if ($this->validateEmailPassword($email,$password)[0] && $this->validateEmailPassword($email,$password)[1]){
-
+            $bad_message = $this->compareEmailPassword($this->connectDb());
        }else{
            $errorMessage = $this->messageError($email,$password);
+           $email_message = $errorMessage[0];
+           $password_message = $errorMessage[1];
        }
 
-       return $errorMessage;
+       return array($email_message,$password_message,$bad_message);
    }
 
-   private function compareEmailPassword(): array{
+   private function compareEmailPassword(PDO $connection): string
+   {
         $bad_message= '';
 
+        $statement = $connection->prepare("SELECT * FROM Users WHERE email =?");
+        $statement->execute([$_POST['email']]);
+        $user = $statement->fetch(PDO::FETCH_ASSOC);
 
+       if ($user && !strcmp($_POST['password'],$user['password']))
+       {
+           $_SESSION["login"] = "OK";
+           $_SESSION["username"] = $_POST['email'];
+           $redirect = "private.php";
+           header("Location: /search.php");
+           exit;
+           // $bad_message = $user['password'];
+
+       } else {
+          $bad_message = "The email or the password are wrong, try again";
+           //$bad_message = $user['password'] . $_POST['password'];
+       }
         return $bad_message;
    }
 

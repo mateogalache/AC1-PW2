@@ -4,8 +4,16 @@ use GuzzleHttp\Client;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
+session_start();
+/*
+if(!(isset($_SESSION["login"]) && $_SESSION["login"] == "OK")) {
+    header("Location: login.php");
+    exit;
+}else{
+*/
 
-if(!EMPTY($_POST)) {
+
+   if(!EMPTY($_POST)) {
     $search = $_POST['search'];
     $client = new GuzzleHttp\Client();
     try {
@@ -17,7 +25,10 @@ if(!EMPTY($_POST)) {
     } catch (\GuzzleHttp\Exception\GuzzleException $e) {
         echo 'bad request';
     }
+//}
 }
+
+
 /*
 
 
@@ -52,18 +63,20 @@ if(!EMPTY($_POST)) {
 
             <div class="cats">
                 <?php
-
-                foreach ($catsInfo as $cats) {
-                    echo "<div class='cat'>";
-                    echo "<img src='" . $cats->url . "'>";
-                    echo "<div class= 'info'>";
-                    echo "<div>";
-                    echo "Width: " . $cats->width . "px" ;
-                    echo"</div>";
-                    echo "<div>";
-                    echo  "Height: " . $cats->height . "px" ;
-                    echo "</div></div></div>";
+                if(!EMPTY($_POST)){
+                    foreach ($catsInfo as $cats) {
+                        echo "<div class='cat'>";
+                        echo "<img src='" . $cats->url . "'>";
+                        echo "<div class= 'info'>";
+                        echo "<div>";
+                        echo "Width: " . $cats->width . "px" ;
+                        echo"</div>";
+                        echo "<div>";
+                        echo  "Height: " . $cats->height . "px" ;
+                        echo "</div></div></div>";
+                    }
                 }
+
                 ?>
             </div>
 

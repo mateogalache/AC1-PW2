@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/vendor/autoload.php';
-
+include 'controller.php';
 class login{
     public function loginExecution(): array
     {
@@ -26,17 +26,19 @@ if (!empty($_POST)) {
 
 
 
+
 ?>
 <html>
 <div class="container">
     <div class="container0">
+        <p class= "errorMessage "> <?php echo $bad_message ?></p>
         <div class="title">SIGN IN</div>
-        <form action="Register.php" method="POST" class="formInputs">
-            <input type="text" placeholder="Email" name="email" class="forms" id="email">
+        <form action="login.php" method="POST" class="formInputs">
+            <input type="text" placeholder="Email" name="email" class="forms" id="email" required>
             <p class= "errorMessage "> <?php echo $email_message ?></p>
-            <input type="password" placeholder="Password" name="password" class="forms" id="email">
+            <input type="password" placeholder="Password" name="password" class="forms" id="email" required>
             <p class= "errorMessage "> <?php echo $password_message ?></p>
-            <input type="submit" value="LOG IN" class="registerButton">
+            <input type="submit" value="LOG IN" class="loginButton">
         </form>
         <aside class="alreadyLogged">Not registered? <a href="/Register.php"> Sign up</a></aside>
     </div>
@@ -86,7 +88,7 @@ if (!empty($_POST)) {
     .title{
         font-size: 50px;
     }
-    .registerButton{
+    .loginButton{
         font-size: 25px;
         background: none;
         border-radius: 50px;
@@ -94,7 +96,7 @@ if (!empty($_POST)) {
         margin-top: 1.5rem;
         transition: all 300ms ease;
     }
-    .registerButton:hover{
+    .loginButton:hover{
         color: white;
         background: black;
     }
