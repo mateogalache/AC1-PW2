@@ -1,42 +1,23 @@
 <?php
 require_once __DIR__ . '/vendor/autoload.php';
 
+class login{
+    public function loginExecution(): array
+    {
+        $controller = new controller();
+        return $controller->executeLogin();
+    }
+}
 $email_message = '';
 $password_message = '';
+$bad_message = '';
 
 if (!empty($_POST)) {
-
-    $user = 'admin';
-    $pass = 'admin';
-
-    $email = $_POST['email'];
-    $password = $_POST['password'];
-
-    $connection = new PDO('mysql:host=db:3306;dbname=test',$user,$pass);
-    $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
-    $password = preg_match("^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{7,}$^"
-        ,$_POST['password']);
-
-    if ($email && $password){
-
-
-        $statement = $connection->prepare('INSERT INTO Users (email, password) VALUES (:email, :password)');
-        $statement->execute([
-            'email' => $email,
-            'password' => $password,
-        ]);
-        header("Location: /login.php");
-        exit;
-    }else{
-        if (!$email && !$password){
-            $email_message = "Email is not valid";
-            $password_message = "Password must contain at least one number, one capital letter, one small letter, and should be longer than or equal to 7 characters";
-        } else if (!$email){
-            $email_message = "Email is not valid";
-        } else {
-            $password_message = "Password must contain at least one number, one capital letter, one small letter, and should be longer than or equal to 7 characters";
-        }
-    }
+    $login = new Login();
+    $messageError = $login->loginExecution();
+    $email_message = $messageError[0];
+    $password_message = $messageError[1];
+    $bad_message = $messageError[2];
 }
 
 
