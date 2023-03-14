@@ -30,8 +30,8 @@ if (!empty($_POST)) {
 ?>
 <html>
 <div class="container">
+    <p class= "errorMessage "> <?php echo $bad_message ?></p>
     <div class="container0">
-        <p class= "errorMessage "> <?php echo $bad_message ?></p>
         <div class="title">SIGN IN</div>
         <form action="login.php" method="POST" class="formInputs">
             <input type="text" placeholder="Email" name="email" class="forms" id="email" required>
@@ -67,6 +67,7 @@ if (!empty($_POST)) {
         display: flex;
         justify-content: center;
         align-items: center;
+        flex-direction: column;
         width: 100%;
         height: 100%;
     }

@@ -5,18 +5,22 @@ use GuzzleHttp\Client;
 require_once __DIR__ . '/vendor/autoload.php';
 include 'controller.php';
 class search{
+
     public function searchExecution(): mixed
     {
+
+        $search = $_POST['search'];
         if(!EMPTY($_POST)) {
-            $search = $_POST['search'];
+
             $url = "https://api.thecatapi.com/v1/images/search?breeds_id={$search}&limit=100";
 
         } else{
-            $url = "https://api.thecatapi.com/v1/images/search?=&limit=100";
+            $url = "https://api.thecatapi.com/v1/images/search?limit=100";
         }
 
         $controller = new controller();
-        return $controller->getCats($url);
+
+        return array($controller->executeSearch($search,$url),$controller->getHistory());
     }
 }
 //session_start();
@@ -28,35 +32,9 @@ if(!(isset($_SESSION["login"]) && $_SESSION["login"] == "OK")) {
 */
 
 $search = new search();
-$catsInfo = $search->searchExecution();
-
-
-
-
-
-
-
-
-/*
-
-
-    $client = new GuzzleHttp\Client();
-
-    $catsInfo = null;
-
-    $search = $_POST['search'];
-
-    $request = new \GuzzleHttp\Psr7\Request('GET', "https://api.thecatapi.com/v1/images/search?breeds_id=asy&limit=100",[
-            'Content-type' => 'application/json',
-            'x-api-key' => 'live_INrtVm1T5YHM0v8KCjO6PKHJqhxq5igHcSXl75XSja04ZGHO2Oq4MNXP86imhu0x'
-    ]);
-    $promise = $client->sendAsync($request)->then(function ($response) {
-        $catsInfo = json_decode($response->getBody()->getContents()) ;
-    });
-    $promise->wait();
-
-}*/
-
+$Info = $search->searchExecution();
+$catsInfo = $Info[0];
+$history = $Info[1];
 
 
 
@@ -66,39 +44,57 @@ $catsInfo = $search->searchExecution();
     <div class="container">
         <form  action="search.php" class="searchbar" method="POST">
             <input type="text" placeholder="Search" id="search" name="search">
-            <input type="submit" value="Search" class="searchbutton">
+            <input type="submit" value="Search" class="searchButton">
         </form>
-
-            <div class="cats">
-                <?php
-
-                    foreach ($catsInfo as $cats) {
-                        echo "<div class='cat'>";
-                        echo "<img src='" . $cats->url . "'>";
-                        echo "<div class= 'info'>";
-                        echo "<div>";
-                        echo "Width: " . $cats->width . "px" ;
-                        echo"</div>";
-                        echo "<div>";
-                        echo  "Height: " . $cats->height . "px" ;
-                        echo "</div></div></div>";
-                    }
-
-
-                ?>
-            </div>
-
-
+        <div class="history">
+            <h3>History: </h3>
+            <?php
+            $history = array_slice(array_reverse($history),0,10);
+            foreach ($history as $his){
+                echo "<div>";
+                echo $his['query'];
+                echo"</div>";
+                echo "<div>";
+                echo "|";
+                echo"</div>";
+            }
+            ?>
+        </div>
+        <div class="cats">
+            <?php
+                foreach ($catsInfo as $cats) {
+                    echo "<div class='cat'>";
+                    echo "<img src='" . $cats->url . "'>";
+                    echo "<div class= 'info'>";
+                    echo "<div>";
+                    echo "Width: " . $cats->width . "px" ;
+                    echo"</div>";
+                    echo "<div>";
+                    echo  "Height: " . $cats->height . "px" ;
+                    echo "</div></div></div>";
+                }
+            ?>
+        </div>
     </div>
 </html>
 <style>
-    .searchbutton{
+
+    .history{
+        width: 98%;
+        height: 2rem;
+        border: solid black 2px;
+        display: flex;
+        align-items: center;
+        padding-left: 1rem;
+        gap: .5rem;
+    }
+    .searchButton{
         background: none;
         border-radius: 50%;
         cursor: pointer;
         transition: all 300ms ease;
     }
-    .searchbutton:hover{
+    .searchButton:hover{
         background: black;
         color: white;
     }
@@ -120,6 +116,7 @@ $catsInfo = $search->searchExecution();
         justify-content: center;
         display: flex;
         flex-wrap: wrap;
+        margin-top: 2rem;
     }
 
     .container{
@@ -129,13 +126,14 @@ $catsInfo = $search->searchExecution();
     .searchbar{
         margin-top: 2rem ;
         display: flex;
-        justify-content: space-between;
+        justify-content: center;
+        gap: 1rem;
         width: 100%;
     }
     .searchbar input:first-child{
         border-radius: 50px;
         border: 2px solid black;
         padding: 1rem;
-        width: 99%;
+        width: 95%;
     }
 </style>

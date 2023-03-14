@@ -91,16 +91,16 @@ class controller{
    private function compareEmailPassword(PDO $connection): string
    {
         $bad_message= '';
-
         $statement = $connection->prepare("SELECT * FROM Users WHERE email =?");
         $statement->execute([$_POST['email']]);
         $user = $statement->fetch(PDO::FETCH_ASSOC);
+       // $hashed_password = password_hash($user['password'],PASSWORD_DEFAULT);
 
        if ($user && !strcmp($_POST['password'],$user['password']))
        {
            //$_SESSION["login"] = "OK";
            //$_SESSION["username"] = $_POST['email'];
-           $redirect = "private.php";
+           //$redirect = "private.php";
            header("Location: /search.php");
            exit;
            // $bad_message = $user['password'];
@@ -112,11 +112,11 @@ class controller{
         return $bad_message;
    }
 
-   public function getCats(string $url): mixed
+   private function getCats(string $url): mixed
    {
        $client = new GuzzleHttp\Client();
        try {
-           $res = $client->request('GET',$url , [
+           $res = $client->request('GET',$url, [
                'Content-type' => 'application/json',
                'x-api-key' => 'live_INrtVm1T5YHM0v8KCjO6PKHJqhxq5igHcSXl75XSja04ZGHO2Oq4MNXP86imhu0x'
            ]);
@@ -125,6 +125,42 @@ class controller{
            echo 'bad request';
        }
        return $catsInfo;
+   }
+
+   private function saveSearch(string $search): void
+   {
+       $connection = $this->connectDb();
+
+       $statement = $connection->prepare('INSERT INTO Search (query) VALUES (:search)');
+       $statement->execute([
+           'search' => $search,
+       ]);
+
+   }
+
+   public function getHistory(): array|bool
+   {
+
+           $connection = $this->connectDb();
+           $statement = $connection->prepare('SELECT (query) FROM Search');
+           $statement->execute();
+           return $statement->fetchAll(PDO::FETCH_ASSOC);
+
+   }
+
+  /*
+  private function saveUserSearch(): void{
+
+   }
+  */
+
+   public function executeSearch(string $search,string $url): mixed
+   {
+        if (!EMPTY($_POST)){
+            $this->saveSearch($search);
+        }
+       //$this->saveUserSearch();
+       return $this->getCats($url);
    }
 
 
