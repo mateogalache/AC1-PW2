@@ -98,8 +98,8 @@ class controller{
 
        if ($user && !strcmp($_POST['password'],$user['password']))
        {
-           $_SESSION["login"] = "OK";
-           $_SESSION["username"] = $_POST['email'];
+           //$_SESSION["login"] = "OK";
+           //$_SESSION["username"] = $_POST['email'];
            $redirect = "private.php";
            header("Location: /search.php");
            exit;
@@ -111,6 +111,22 @@ class controller{
        }
         return $bad_message;
    }
+
+   public function getCats(string $url): mixed
+   {
+       $client = new GuzzleHttp\Client();
+       try {
+           $res = $client->request('GET',$url , [
+               'Content-type' => 'application/json',
+               'x-api-key' => 'live_INrtVm1T5YHM0v8KCjO6PKHJqhxq5igHcSXl75XSja04ZGHO2Oq4MNXP86imhu0x'
+           ]);
+           $catsInfo = json_decode($res->getBody()->getContents());
+       } catch (\GuzzleHttp\Exception\GuzzleException $e) {
+           echo 'bad request';
+       }
+       return $catsInfo;
+   }
+
 
 
 

@@ -51,7 +51,7 @@ if (!empty($_POST)) {
     .errorMessage{
         color: red;
         text-align: center;
-        width: 25rem;
+        width: 30rem;
     }
     .container{
         display: flex;

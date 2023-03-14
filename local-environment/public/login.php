@@ -48,18 +48,20 @@ if (!empty($_POST)) {
     .alreadyLogged a{
         text-decoration: none;
         color: blue;
+
     }
     .alreadyLogged{
         width: 100%;
         display: flex;
         justify-content: end;
-        margin-top: -1rem;
+        margin-top: -2rem;
         gap: .5rem;
     }
     .errorMessage{
         color: red;
         text-align: center;
-        width: 25rem;
+        height: 1rem;
+        width: 30rem;
     }
     .container{
         display: flex;

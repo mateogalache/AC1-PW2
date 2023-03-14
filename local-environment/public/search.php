@@ -3,8 +3,23 @@
 use GuzzleHttp\Client;
 
 require_once __DIR__ . '/vendor/autoload.php';
+include 'controller.php';
+class search{
+    public function searchExecution(): mixed
+    {
+        if(!EMPTY($_POST)) {
+            $search = $_POST['search'];
+            $url = "https://api.thecatapi.com/v1/images/search?breeds_id={$search}&limit=100";
 
-session_start();
+        } else{
+            $url = "https://api.thecatapi.com/v1/images/search?=&limit=100";
+        }
+
+        $controller = new controller();
+        return $controller->getCats($url);
+    }
+}
+//session_start();
 /*
 if(!(isset($_SESSION["login"]) && $_SESSION["login"] == "OK")) {
     header("Location: login.php");
@@ -12,21 +27,14 @@ if(!(isset($_SESSION["login"]) && $_SESSION["login"] == "OK")) {
 }else{
 */
 
+$search = new search();
+$catsInfo = $search->searchExecution();
 
-   if(!EMPTY($_POST)) {
-    $search = $_POST['search'];
-    $client = new GuzzleHttp\Client();
-    try {
-        $res = $client->request('GET', "https://api.thecatapi.com/v1/images/search?breeds_id={$search}&limit=100", [
-            'Content-type' => 'application/json',
-            'x-api-key' => 'live_INrtVm1T5YHM0v8KCjO6PKHJqhxq5igHcSXl75XSja04ZGHO2Oq4MNXP86imhu0x'
-        ]);
-        $catsInfo = json_decode($res->getBody()->getContents());
-    } catch (\GuzzleHttp\Exception\GuzzleException $e) {
-        echo 'bad request';
-    }
-//}
-}
+
+
+
+
+
 
 
 /*
@@ -58,12 +66,12 @@ if(!(isset($_SESSION["login"]) && $_SESSION["login"] == "OK")) {
     <div class="container">
         <form  action="search.php" class="searchbar" method="POST">
             <input type="text" placeholder="Search" id="search" name="search">
-            <input type="submit" value="Search">
+            <input type="submit" value="Search" class="searchbutton">
         </form>
 
             <div class="cats">
                 <?php
-                if(!EMPTY($_POST)){
+
                     foreach ($catsInfo as $cats) {
                         echo "<div class='cat'>";
                         echo "<img src='" . $cats->url . "'>";
@@ -75,7 +83,7 @@ if(!(isset($_SESSION["login"]) && $_SESSION["login"] == "OK")) {
                         echo  "Height: " . $cats->height . "px" ;
                         echo "</div></div></div>";
                     }
-                }
+
 
                 ?>
             </div>
@@ -84,6 +92,16 @@ if(!(isset($_SESSION["login"]) && $_SESSION["login"] == "OK")) {
     </div>
 </html>
 <style>
+    .searchbutton{
+        background: none;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 300ms ease;
+    }
+    .searchbutton:hover{
+        background: black;
+        color: white;
+    }
     .cat img {
         width: 25rem;
         aspect-ratio: 1/1;
