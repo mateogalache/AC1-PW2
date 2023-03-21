@@ -2,9 +2,7 @@
 
 use JetBrains\PhpStorm\NoReturn;
 
-$EMAIL_MESSAGE = "Email is not valid";
-$PASSWORD_MESSAGE = "Password must contain at least one number, one capital letter, one small letter, and should be longer than or equal to 7 characters";
-$BAD_MESSAGE = "The email or the password are wrong, try again";
+
 class controller{
 
 
@@ -37,11 +35,12 @@ class controller{
     }
 
     #[NoReturn] private function insertEmailPassword(PDO $connection, string $email, string $password): void{
-        $statement = $connection->prepare('INSERT INTO Users (email, password) VALUES (:email, :password)');
-        $statement->execute([
-            'email' => $email,
-            'password' => $password,
-        ]);
+        $hashed_password = password_hash($password,PASSWORD_DEFAULT);
+        $statement = $connection->prepare('INSERT INTO Users (email, password,created_at,updated_at) VALUES (:email, :password,NOW(),NOW())');
+
+        $statement->bindParam('email',$email,PDO::PARAM_STR);
+        $statement->bindParam('password',$hashed_password,PDO::PARAM_STR);
+        $statement->execute();
         header("Location: /login.php");
         exit;
     }
@@ -94,20 +93,20 @@ class controller{
         $statement = $connection->prepare("SELECT * FROM Users WHERE email =?");
         $statement->execute([$_POST['email']]);
         $user = $statement->fetch(PDO::FETCH_ASSOC);
-       // $hashed_password = password_hash($user['password'],PASSWORD_DEFAULT);
 
-       if ($user && !strcmp($_POST['password'],$user['password']))
+
+       if ($user && password_verify($_POST['password'],$user['password']))
        {
-           //$_SESSION["login"] = "OK";
-           //$_SESSION["username"] = $_POST['email'];
-           //$redirect = "private.php";
+           session_start();
+           $_SESSION['id'] = $user['user_id'];
+
            header("Location: /search.php");
            exit;
-           // $bad_message = $user['password'];
+
 
        } else {
           $bad_message = "The email or the password are wrong, try again";
-           //$bad_message = $user['password'] . $_POST['password'];
+
        }
         return $bad_message;
    }
@@ -131,33 +130,38 @@ class controller{
    {
        $connection = $this->connectDb();
 
-       $statement = $connection->prepare('INSERT INTO Search (query) VALUES (:search)');
+       $statement = $connection->prepare('INSERT INTO Search (query,timestamp) VALUES (:search,NOW())');
        $statement->execute([
            'search' => $search,
        ]);
 
    }
 
-   public function getHistory(): array|bool
+
+
+   private function getCatId(): array
    {
-
-           $connection = $this->connectDb();
-           $statement = $connection->prepare('SELECT (query) FROM Search');
-           $statement->execute();
-           return $statement->fetchAll(PDO::FETCH_ASSOC);
-
+       $connection = $this->connectDb();
+       $statement = $connection->prepare('SELECT (cat_search_id) FROM Search ORDER BY cat_search_id DESC LIMIT 1');
+       $statement->execute();
+       return $statement->fetch(PDO::FETCH_ASSOC);
    }
 
-  /*
   private function saveUserSearch(): void{
-
+        $cat_search = $this->getCatId();
+        $statement = $this->connectDb()->prepare('INSERT INTO UserHistory (user_id,cat_search_id) VALUES (:user_id, :cat_search_id) ');
+          $statement->execute([
+              'user_id' => $_SESSION['id'],
+              'cat_search_id' => $cat_search['cat_search_id'],
+          ]);
    }
-  */
+
 
    public function executeSearch(string $search,string $url): mixed
    {
         if (!EMPTY($_POST)){
             $this->saveSearch($search);
+            $this->saveUserSearch();
         }
        //$this->saveUserSearch();
        return $this->getCats($url);

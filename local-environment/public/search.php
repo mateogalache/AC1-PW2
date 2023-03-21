@@ -9,9 +9,10 @@ class search{
     public function searchExecution(): mixed
     {
 
-        $search = $_POST['search'];
-        if(!EMPTY($_POST)) {
+        $search = '';
 
+        if(!EMPTY($_POST)) {
+            $search = $_POST['search'];
             $url = "https://api.thecatapi.com/v1/images/search?breeds_id={$search}&limit=100";
 
         } else{
@@ -20,22 +21,21 @@ class search{
 
         $controller = new controller();
 
-        return array($controller->executeSearch($search,$url),$controller->getHistory());
+        return $controller->executeSearch($search,$url);
     }
 }
-//session_start();
-/*
-if(!(isset($_SESSION["login"]) && $_SESSION["login"] == "OK")) {
+
+session_start();
+
+if(!isset($_SESSION['id'])) {
     header("Location: login.php");
     exit;
 }else{
-*/
-
 $search = new search();
-$Info = $search->searchExecution();
-$catsInfo = $Info[0];
-$history = $Info[1];
+$catsInfo = $search->searchExecution();
 
+
+}
 
 
 ?>
@@ -46,20 +46,7 @@ $history = $Info[1];
             <input type="text" placeholder="Search" id="search" name="search">
             <input type="submit" value="Search" class="searchButton">
         </form>
-        <div class="history">
-            <h3>History: </h3>
-            <?php
-            $history = array_slice(array_reverse($history),0,10);
-            foreach ($history as $his){
-                echo "<div>";
-                echo $his['query'];
-                echo"</div>";
-                echo "<div>";
-                echo "|";
-                echo"</div>";
-            }
-            ?>
-        </div>
+
         <div class="cats">
             <?php
                 foreach ($catsInfo as $cats) {
