@@ -6,7 +6,6 @@ use JetBrains\PhpStorm\NoReturn;
 class controller{
 
 
-
     private function connectDb(): PDO
     {
         return new PDO('mysql:host=db:3306;dbname=test','admin','admin');
@@ -37,7 +36,6 @@ class controller{
     #[NoReturn] private function insertEmailPassword(PDO $connection, string $email, string $password): void{
         $hashed_password = password_hash($password,PASSWORD_DEFAULT);
         $statement = $connection->prepare('INSERT INTO Users (email, password,created_at,updated_at) VALUES (:email, :password,NOW(),NOW())');
-
         $statement->bindParam('email',$email,PDO::PARAM_STR);
         $statement->bindParam('password',$hashed_password,PDO::PARAM_STR);
         $statement->execute();
@@ -131,13 +129,9 @@ class controller{
        $connection = $this->connectDb();
 
        $statement = $connection->prepare('INSERT INTO Search (query,timestamp) VALUES (:search,NOW())');
-       $statement->execute([
-           'search' => $search,
-       ]);
-
+       $statement->bindParam('search',$search,PDO::PARAM_STR);
+       $statement->execute();
    }
-
-
 
    private function getCatId(): array
    {
@@ -148,12 +142,11 @@ class controller{
    }
 
   private function saveUserSearch(): void{
-        $cat_search = $this->getCatId();
-        $statement = $this->connectDb()->prepare('INSERT INTO UserHistory (user_id,cat_search_id) VALUES (:user_id, :cat_search_id) ');
-          $statement->execute([
-              'user_id' => $_SESSION['id'],
-              'cat_search_id' => $cat_search['cat_search_id'],
-          ]);
+      $cat_search = $this->getCatId();
+      $statement = $this->connectDb()->prepare('INSERT INTO UserHistory (user_id,cat_search_id) VALUES (:user_id, :cat_search_id) ');
+      $statement->bindParam('user_id',$_SESSION['id'],PDO::PARAM_INT);
+      $statement->bindParam('cat_search_id',$cat_search['cat_search_id'],PDO::PARAM_INT);
+      $statement->execute();
    }
 
 
@@ -166,10 +159,5 @@ class controller{
        //$this->saveUserSearch();
        return $this->getCats($url);
    }
-
-
-
-
-
 
 }

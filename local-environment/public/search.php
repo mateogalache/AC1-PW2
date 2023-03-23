@@ -11,7 +11,7 @@ class search{
 
         $search = '';
 
-        if(!EMPTY($_POST)) {
+        if(!EMPTY($_POST) && isset($_POST['searchButton'])) {
             $search = $_POST['search'];
             $url = "https://api.thecatapi.com/v1/images/search?breeds_id={$search}&limit=100";
 
@@ -44,7 +44,7 @@ $catsInfo = $search->searchExecution();
     <div class="container">
         <form  action="search.php" class="searchbar" method="POST">
             <input type="text" placeholder="Search" id="search" name="search">
-            <input type="submit" value="Search" class="searchButton">
+            <input type="submit" value="Search" class="searchButton" name="searchButton">
         </form>
 
         <div class="cats">
